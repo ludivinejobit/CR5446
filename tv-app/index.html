@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ma TV Libre</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>📺 Ma TV Libre</h1>
+    <nav>
+      <button class="tab active" data-view="tv">Chaînes TV</button>
+      <button class="tab" data-view="films">Films gratuits</button>
+      <button class="tab" data-view="platforms">Plateformes officielles</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Chaînes TV -->
+    <section id="view-tv" class="view active">
+      <div class="toolbar">
+        <label>Pays
+          <select id="country"></select>
+        </label>
+        <label>Catégorie
+          <select id="category"><option value="">Toutes</option></select>
+        </label>
+        <input id="search" type="search" placeholder="Rechercher une chaîne…">
+        <label class="file">Charger ma playlist M3U
+          <input id="m3uFile" type="file" accept=".m3u,.m3u8">
+        </label>
+      </div>
+      <p id="tvStatus" class="status"></p>
+      <div id="channels" class="grid"></div>
+    </section>
+
+    <!-- Films (domaine public, Internet Archive) -->
+    <section id="view-films" class="view">
+      <div class="toolbar">
+        <input id="filmSearch" type="search" placeholder="Rechercher un film (domaine public)…">
+        <button id="filmGo">Rechercher</button>
+      </div>
+      <p class="status">Films libres de droits et du domaine public, hébergés légalement par l'Internet Archive.</p>
+      <div id="films" class="grid"></div>
+    </section>
+
+    <!-- Plateformes légales gratuites -->
+    <section id="view-platforms" class="view">
+      <p class="status">Plateformes gratuites et légales (films, séries, replay, direct). Ouvrez-les sur votre TV connectée, Chromecast, Fire TV ou Apple TV.</p>
+      <div id="platforms" class="grid"></div>
+    </section>
+  </main>
+
+  <!-- Lecteur -->
+  <div id="player" class="player hidden">
+    <div class="player-bar">
+      <span id="playerTitle"></span>
+      <div>
+        <button id="copyUrl" title="Copier l'URL (pour VLC, Kodi…)">Copier l'URL</button>
+        <button id="fullscreen">Plein écran</button>
+        <button id="closePlayer">✕ Fermer</button>
+      </div>
+    </div>
+    <video id="video" controls autoplay playsinline></video>
+    <iframe id="frame" allowfullscreen allow="autoplay; fullscreen"></iframe>
+    <p id="playerError" class="status"></p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
