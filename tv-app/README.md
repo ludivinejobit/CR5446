@@ -38,3 +38,7 @@ Application web (HTML/JS, sans installation ni serveur) pour regarder sur votre 
   sur leur chiffre d'affaires et leurs recettes publicitaires en France. Vous ne la payez pas directement,
   mais elle peut se répercuter sur le prix des abonnements.
 - La **redevance TV** a été supprimée en 2022 : arrêter la box ne crée aucune taxe et ne permet pas d'en économiser une.
+- **Projet de « taxe au gigaoctet » (budget 2026, non adopté à ce jour)** : un amendement voté de justesse
+  en commission à l'Assemblée prévoit 0,055 € par Go de trafic, payé par les grandes plateformes (Netflix, Google/YouTube,
+  Meta, Amazon…) et plafonné à 15 % de leur chiffre d'affaires en France. Les abonnés ne la paieraient pas
+  directement, mais les plateformes pourraient augmenter leurs prix pour la répercuter. Le texte peut encore être modifié ou supprimé.
