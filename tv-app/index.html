@@ -27,6 +27,13 @@
         <label>Catégorie
           <select id="category"><option value="">Toutes</option></select>
         </label>
+        <label>Qualité
+          <select id="quality">
+            <option value="1080">1080p et plus</option>
+            <option value="720">720p et plus</option>
+            <option value="0">Toutes</option>
+          </select>
+        </label>
         <input id="search" type="search" placeholder="Rechercher une chaîne…">
         <label class="file">Charger ma playlist M3U
           <input id="m3uFile" type="file" accept=".m3u,.m3u8">
@@ -39,11 +46,25 @@
     <!-- Films (domaine public, Internet Archive) -->
     <section id="view-films" class="view">
       <div class="toolbar">
-        <input id="filmSearch" type="search" placeholder="Rechercher un film (domaine public)…">
+        <label>Collection
+          <select id="filmCollection">
+            <option value="feature_films">🎬 Longs métrages</option>
+            <option value="classic_tv">📺 Séries TV classiques</option>
+            <option value="Film_Noir">🕵️ Films noirs</option>
+            <option value="SciFi_Horror">👽 Science-fiction &amp; horreur</option>
+            <option value="Comedy_Films">😂 Comédies</option>
+            <option value="silent_films">🎞️ Films muets</option>
+            <option value="classic_cartoons">🐭 Dessins animés</option>
+            <option value="moviesandfilms">🍿 Tous les films</option>
+          </select>
+        </label>
+        <label class="check"><input id="filmFrench" type="checkbox"> En français</label>
+        <input id="filmSearch" type="search" placeholder="Rechercher un titre…">
         <button id="filmGo">Rechercher</button>
       </div>
-      <p class="status">Films libres de droits et du domaine public, hébergés légalement par l'Internet Archive.</p>
+      <p class="status">Films et séries libres de droits ou du domaine public, hébergés légalement par l'Internet Archive. Pour des films récents gratuits : onglet « Plateformes officielles » et chaînes « Films / Séries 24h/24 ».</p>
       <div id="films" class="grid"></div>
+      <p class="center"><button id="filmMore" hidden>Plus de résultats</button></p>
     </section>
 
     <!-- Plateformes légales gratuites -->

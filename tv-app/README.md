@@ -4,8 +4,11 @@ Application web (HTML/JS, sans installation ni serveur) pour regarder sur votre 
 
 - **Chaînes TV en direct** pour la France et environ 200 pays, à partir des playlists publiques
   [iptv-org](https://github.com/iptv-org/iptv), qui ne recensent que des flux diffusés gratuitement.
-  Filtres par pays, catégorie et nom. Vous pouvez aussi charger votre propre fichier `.m3u`.
-- **Films gratuits et légaux** : des milliers de films du domaine public (Internet Archive) lus directement dans l'application.
+  Filtres par pays, catégorie, nom et **qualité** (1080p et plus par défaut, avec un badge Full HD / 4K).
+  Listes spéciales : **chaînes Films 24h/24**, **chaînes Séries 24h/24** et **chaînes en français** de tous pays.
+  Vous pouvez aussi charger votre propre fichier `.m3u`.
+- **Films et séries gratuits et légaux** (Internet Archive) : longs métrages, séries TV classiques, films noirs,
+  science-fiction, comédies, films muets, dessins animés, avec un filtre « En français » et un bouton « Plus de résultats ».
 - **Plateformes officielles gratuites** : france.tv, ARTE, TF1+, M6+, Pluto TV, Rakuten TV, Plex, Samsung TV Plus…
 - Navigation à la **télécommande** (flèches, OK, Retour) et lecture en plein écran.
 

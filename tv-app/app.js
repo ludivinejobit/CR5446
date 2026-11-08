@@ -18,6 +18,10 @@ const PLATFORMS = [
   { name: 'LG Channels', desc: 'Chaînes gratuites (TV LG)', url: 'https://www.lg.com/fr/lg-channels/' },
   { name: 'YouTube', desc: 'Films gratuits avec pub (section Films)', url: 'https://www.youtube.com/feed/storefront' },
   { name: 'Internet Archive', desc: 'Milliers de films du domaine public', url: 'https://archive.org/details/feature_films' },
+  { name: 'Molotov (offre gratuite)', desc: 'Chaînes TNT en direct, appli TV', url: 'https://www.molotov.tv' },
+  { name: 'Rakuten Viki', desc: 'Séries asiatiques gratuites avec pub', url: 'https://www.viki.com' },
+  { name: 'HENRI – Cinémathèque', desc: 'Films rares et restaurés, gratuits', url: 'https://www.cinematheque.fr/henri/' },
+  { name: 'Médiathèque numérique', desc: 'Films gratuits avec votre carte de bibliothèque', url: 'https://www.mediatheque-numerique.com' },
   { name: 'Euronews / France 24', desc: 'Info en continu, multilingue', url: 'https://www.france24.com/fr/direct' },
 ];
 
@@ -50,7 +54,8 @@ function parseM3U(text) {
         group: attr('group-title') || 'Autres',
       };
     } else if (line && !line.startsWith('#') && info) {
-      out.push({ ...info, url: line });
+      const res = info.name.match(/\((\d{3,4})p\)/);
+      out.push({ ...info, height: res ? Number(res[1]) : 0, url: line });
       info = null;
     }
   }
@@ -69,14 +74,20 @@ async function loadCountries() {
       sel.append(el('option', { value: code }, name));
     }
   }
-  sel.prepend(el('option', { value: 'ALL' }, '🌍 Monde entier (très long)'));
+  sel.prepend(
+    el('option', { value: 'categories/movies' }, '🎬 Chaînes Films 24h/24 (monde)'),
+    el('option', { value: 'categories/series' }, '📺 Chaînes Séries 24h/24 (monde)'),
+    el('option', { value: 'languages/fra' }, '🇫🇷 Chaînes en français (tous pays)'),
+    el('option', { value: 'ALL' }, '🌍 Monde entier (très long)'));
   sel.value = 'fr';
   sel.addEventListener('change', () => loadPlaylist(sel.value));
   loadPlaylist('fr');
 }
 
 async function loadPlaylist(code) {
-  const url = code === 'ALL' ? `${IPTV}/iptv/index.m3u` : `${IPTV}/iptv/countries/${code}.m3u`;
+  const url = code === 'ALL' ? `${IPTV}/iptv/index.m3u`
+    : code.includes('/') ? `${IPTV}/iptv/${code}.m3u`
+    : `${IPTV}/iptv/countries/${code}.m3u`;
   $('#tvStatus').textContent = 'Chargement des chaînes…';
   try {
     const res = await fetch(url);
@@ -98,36 +109,53 @@ function setChannels(list) {
 function renderChannels() {
   const q = $('#search').value.toLowerCase();
   const g = $('#category').value;
-  const list = allChannels.filter((c) => c.name.toLowerCase().includes(q) && (!g || c.group.split(';').includes(g)));
-  $('#tvStatus').textContent = `${list.length} chaîne(s). Certaines peuvent être indisponibles ou géo-restreintes.`;
+  const minQ = Number($('#quality').value);
+  const list = allChannels
+    .filter((c) => c.name.toLowerCase().includes(q) && (!g || c.group.split(';').includes(g)) && c.height >= minQ)
+    .sort((a, b) => b.height - a.height || a.name.localeCompare(b.name));
+  $('#tvStatus').textContent = `${list.length} chaîne(s)${minQ ? ` en ${minQ}p ou plus` : ''}. Certaines peuvent être indisponibles ou géo-restreintes.`
+    + (minQ && !list.length && allChannels.length ? ' Essayez « 720p et plus » ou « Toutes ».' : '');
   const frag = document.createDocumentFragment();
   for (const c of list.slice(0, 1500)) {
     frag.append(el('button', { class: 'card', onclick: () => playStream(c.name, c.url) },
       el('img', { src: c.logo || 'data:,', alt: '', loading: 'lazy' }),
-      el('span', { class: 'name' }, c.name),
-      el('span', { class: 'meta' }, c.group)));
+      el('span', { class: 'name' }, c.name.replace(/\s*\(\d{3,4}p\)/, '')),
+      el('span', { class: 'meta' }, c.height ? el('span', { class: 'badge' }, c.height >= 2160 ? '4K' : c.height >= 1080 ? 'Full HD' : `${c.height}p`) : '', ` ${c.group}`)));
   }
   $('#channels').replaceChildren(frag);
 }
 
 // ---------- Films du domaine public ----------
-async function searchFilms() {
-  const q = $('#filmSearch').value.trim();
-  const query = `collection:(feature_films) AND mediatype:(movies)${q ? ` AND title:(${q})` : ''}`;
-  const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(query)}&fl[]=identifier&fl[]=title&fl[]=year&sort[]=downloads+desc&rows=60&output=json`;
-  $('#films').replaceChildren(el('p', { class: 'status' }, 'Recherche…'));
+let filmPage = 1;
+
+async function searchFilms(more = false) {
+  filmPage = more ? filmPage + 1 : 1;
+  const q = $('#filmSearch').value.trim().replace(/[()"]/g, ' ');
+  const parts = [`collection:(${$('#filmCollection').value})`, 'mediatype:(movies)'];
+  if ($('#filmFrench').checked) parts.push('language:(French OR fre OR fra OR Français)');
+  if (q) parts.push(`title:(${q})`);
+  const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(parts.join(' AND '))}`
+    + `&fl[]=identifier&fl[]=title&fl[]=year&sort[]=downloads+desc&rows=60&page=${filmPage}&output=json`;
+  const box = $('#films');
+  const more_ = $('#filmMore');
+  if (!more) box.replaceChildren(el('p', { class: 'status' }, 'Recherche…'));
+  more_.hidden = true;
   try {
     const data = await (await fetch(url)).json();
+    const docs = data.response.docs;
     const frag = document.createDocumentFragment();
-    for (const d of data.response.docs) {
+    for (const d of docs) {
       frag.append(el('button', { class: 'card', onclick: () => playEmbed(d.title, `https://archive.org/embed/${d.identifier}`) },
         el('img', { src: `https://archive.org/services/img/${d.identifier}`, alt: '', loading: 'lazy' }),
         el('span', { class: 'name' }, d.title),
         el('span', { class: 'meta' }, d.year || '')));
     }
-    $('#films').replaceChildren(frag.childNodes.length ? frag : el('p', { class: 'status' }, 'Aucun résultat.'));
+    if (!more) box.replaceChildren();
+    if (!docs.length && !more) box.append(el('p', { class: 'status' }, 'Aucun résultat.'));
+    box.append(frag);
+    more_.hidden = filmPage * 60 >= data.response.numFound;
   } catch {
-    $('#films').replaceChildren(el('p', { class: 'status' }, 'Recherche indisponible pour le moment.'));
+    if (!more) box.replaceChildren(el('p', { class: 'status' }, 'Recherche indisponible pour le moment.'));
   }
 }
 
@@ -217,7 +245,11 @@ function setupNavigation() {
 
   $('#search').addEventListener('input', renderChannels);
   $('#category').addEventListener('change', renderChannels);
-  $('#filmGo').addEventListener('click', searchFilms);
+  $('#quality').addEventListener('change', renderChannels);
+  $('#filmGo').addEventListener('click', () => searchFilms());
+  $('#filmMore').addEventListener('click', () => searchFilms(true));
+  $('#filmCollection').addEventListener('change', () => searchFilms());
+  $('#filmFrench').addEventListener('change', () => searchFilms());
   $('#filmSearch').addEventListener('keydown', (e) => e.key === 'Enter' && searchFilms());
   $('#closePlayer').addEventListener('click', closePlayer);
   $('#fullscreen').addEventListener('click', () => $('#player').requestFullscreen?.());

@@ -26,3 +26,7 @@ main { padding:16px 24px; }
 .player-bar { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 16px; background:#111; flex-wrap:wrap; }
 .player video, .player iframe { flex:1; width:100%; border:0; background:#000; min-height:0; }
 @media (max-width:600px){ body{font-size:16px;} header,main{padding:12px 16px;} .grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));} }
+.toolbar .check { flex-direction:row; align-items:center; gap:8px; font-size:1rem; color:var(--text); }
+.check input { width:22px; height:22px; }
+.center { text-align:center; margin-top:16px; }
+.badge { background:var(--accent); color:#fff; border-radius:6px; padding:1px 6px; font-size:.7rem; font-weight:700; }
